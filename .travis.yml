@@ -1,0 +1,46 @@
+language: node_js
+node_js:
+  - "16.14.2"
+branches:
+  only:
+    - staging
+    - main
+    - development
+#Including docker as a service
+services:
+  - docker
+
+before_install:
+  - pip install --user awscli
+  - export PATH=$PATH:$HOME/.local/bin
+  - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 726213127376.dkr.ecr.us-east-1.amazonaws.com
+  - docker pull 726213127376.dkr.ecr.us-east-1.amazonaws.com/bl-infra-dep-image:latest
+
+
+sudo: required
+jobs:
+  include:
+    - stage: Docker build process
+      # Build the docker image and push it to ecr
+      if: type IN (push) and (branch = staging || branch = development || branch = main)
+      script:
+        - set -e
+        - echo "Building docker image and pushing to ecr"
+        - make ecr-login
+        - make docker/ecr-create-repo
+        - make docker-build
+        - make docker-list-images
+        - make docker-tag
+        - make docker-push
+
+    - stage: Kubernetes deployment
+      # Deploy the updated docker image to kubernetes
+      if: type IN (push) and (branch = staging || branch = development || branch = main)
+      script:
+        - set -e
+        - echo "Running kustomization and applying k8s config for this service"
+        - make update-image-hash
+        - make docker/apply-k8s-changes
+notifications:
+  slack:
+    secure: <travis-encrypted-token>

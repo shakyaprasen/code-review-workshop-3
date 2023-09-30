@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bl-ms-widgets-migrate
+spec:
+  ttlSecondsAfterFinished: 100
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: bl-ms-widgets-migrate
+        image: bl-ms-widgets
+        env:
+          - name: MYSQL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: bl-env-secret
+                key: MYSQL_USERNAME
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: bl-env-secret
+                key: MYSQL_PASSWORD
+          - name: MYSQL_HOST
+            valueFrom:
+              secretKeyRef:
+                name: bl-env-secret
+                key: MYSQL_HOST
+          - name: DATABASE_URL
+            value: "mysql://$(MYSQL_USERNAME):$(MYSQL_PASSWORD)@$(MYSQL_HOST):3306/widgets"
+        command: ["npx", "prisma", "migrate", "deploy"]
+

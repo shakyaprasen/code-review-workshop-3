@@ -1,0 +1,95 @@
+version: '3'
+
+services:
+  ms_widgets:
+    container_name: 'ms_widgets'
+    build:
+      context: .
+      dockerfile: ./Dockerfile-dev
+    volumes:
+      - .:/app
+    links:
+      - widgets_db
+    depends_on:
+      - widgets_db
+    command: npm run start:dev
+    ports:
+      - 3000:3000
+      - 9229:9229
+    environment:
+      DATABASE_URL: mysql://root:password@widgets_db:3306/widgets
+      NODE_ENV: docker-compose
+
+  widgets_zookeeper:
+    image: quay.io/debezium/zookeeper:1.9.4.Final
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+    volumes:
+      - zookeeperData:/zookeeper/data
+      - zookeeperTxns:/zookeeper/txns
+      - zookeeperLogs:/zookeeper/logs
+
+  widgets_db:
+    image: mysql:8.0
+    restart: always
+    cap_add:
+      - SYS_NICE
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=widgets
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+
+  widgets_kafka:
+    image: quay.io/debezium/kafka:1.9.4.Final
+    ports:
+     - 9092:9092
+    links:
+     - widgets_zookeeper
+    volumes:
+      - kafkadata:/kafka/data
+      - kafkaLogs:/kafka/logs
+    environment:
+     - ZOOKEEPER_CONNECT=widgets_zookeeper:2181
+
+  widgets_kafka-ui:
+    container_name: bl-widget-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8081:8080
+    links:
+     - widgets_zookeeper
+     - widgets_kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: widgets_kafka:9092
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: first
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://connect:8083
+      KAFKA_CLUSTERS_0_ZOOKEEPER: widgets_zookeeper:2181
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    hostname: jaeger
+    ports:
+      - 6831:6831/udp # accept jaeger.thrift in compact Thrift protocol used by most current Jaeger clients
+      - 6832:6832/udp # accept jaeger.thrift in binary Thrift protocol used by Node.js Jaeger client (because thriftrw npm package does not support compact protocol)
+      - 5775:5775/udp # accept zipkin.thrift in compact Thrift protocol (deprecated; only used by very old Jaeger clients, circa 2016)
+      - 5778:5778 # serve configs, sampling strategies
+      - 16686:16686 # UI port
+      - 14269:14269 # collector admin port: health check at / and metrics at /metrics
+      - 14268:14268
+    environment:
+      - MEMORY_MAX_TRACES=100000
+
+volumes:
+  kafkadata:
+  kafkaLogs:
+  zookeeperData:
+  zookeeperLogs:
+  zookeeperTxns:
+  db:
+    driver: local
