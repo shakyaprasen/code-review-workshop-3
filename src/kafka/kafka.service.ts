@@ -23,17 +23,18 @@ import {
   Producer,
 } from 'kafkajs';
 
-import {ConfigType} from '@nestjs/config';
+import { ConfigType } from '@nestjs/config';
 import kafkaConfig from './config/kafka.config';
-import {BROADCAST_TOPICS, INCOMING_TOPICS} from './kafka.constants';
+import { BROADCAST_TOPICS, INCOMING_TOPICS } from './kafka.constants';
 import appConfig from 'src/config/app.config';
 
-import {formattedLog} from 'src/common/utils/index.utils';
-import {randomUUID} from 'crypto';
+import { formattedLog } from 'src/common/utils/index.utils';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class KafkaService
-  implements OnApplicationBootstrap, OnApplicationShutdown {
+  implements OnApplicationBootstrap, OnApplicationShutdown
+{
   retryEl = retry(handleAll, {
     maxAttempts: 20,
     backoff: new ExponentialBackoff(),
@@ -116,12 +117,12 @@ export class KafkaService
       autoCommitThreshold: 1,
       autoCommit: true,
       partitionsConsumedConcurrently: 5, // Default: 1
-      eachMessage: async ({message}) => {
+      eachMessage: async ({ message }) => {
         const parsedMessage = this.parseMessage(message);
         try {
           switch (
-          parsedMessage.type
-          // Handle based on messages type
+            parsedMessage.type
+            // Handle based on messages type
           ) {
           }
         } catch (error) {
@@ -149,7 +150,7 @@ export class KafkaService
 
     try {
       this.retryWithBreaker.execute(() =>
-        this.producer.send({topic, messages: formattedMessages}),
+        this.producer.send({ topic, messages: formattedMessages }),
       );
     } catch (error) {
       this.logger.error(

@@ -1,12 +1,12 @@
-import {Inject, Injectable, Logger, NotFoundException} from '@nestjs/common';
-import {PaginationQueryDto} from 'src/common/dto/pagination-query.dto';
-import {CreateReviewDto} from './dto/create-review.dto';
-import {UpdateReviewDto} from './dto/update-review.dto';
-import {PrismaService} from 'src/prisma/prisma.service';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 import prismaConfig from 'src/prisma/prisma.config';
-import {ConfigType} from '@nestjs/config';
-import {KafkaService} from 'src/kafka/kafka.service';
-import {BROADCAST_TOPICS} from 'src/kafka/kafka.constants';
+import { ConfigType } from '@nestjs/config';
+import { KafkaService } from 'src/kafka/kafka.service';
+import { BROADCAST_TOPICS } from 'src/kafka/kafka.constants';
 
 @Injectable()
 export class ReviewsService {
@@ -21,7 +21,7 @@ export class ReviewsService {
   }
 
   findAll(params: PaginationQueryDto) {
-    const {limit, offset} = params;
+    const { limit, offset } = params;
 
     return this.prisma.review.findMany({
       skip: offset,
@@ -30,7 +30,7 @@ export class ReviewsService {
   }
 
   async findOne(id: number): Promise<any> {
-    const review = await this.prisma.review.findUnique({where: {id}});
+    const review = await this.prisma.review.findUnique({ where: { id } });
     if (!review) {
       throw new NotFoundException(`Review with id ${id} not found`);
     }
@@ -38,7 +38,7 @@ export class ReviewsService {
   }
 
   async create(createReviewDto: CreateReviewDto) {
-    await this.prisma.review.create({data: {...createReviewDto}});
+    await this.prisma.review.create({ data: { ...createReviewDto } });
     this.kafkaService.sendMessage(
       [
         {
@@ -53,7 +53,7 @@ export class ReviewsService {
   async update(id: number, updateReviewDto: UpdateReviewDto) {
     try {
       const review = await this.prisma.review.update({
-        where: {id},
+        where: { id },
         data: updateReviewDto,
       });
       return review;
@@ -67,6 +67,6 @@ export class ReviewsService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.review.delete({where: {id}});
+    return this.prisma.review.delete({ where: { id } });
   }
 }
