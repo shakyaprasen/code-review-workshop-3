@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: bl-ms-widgets-migrate
+  name: bl-ms-reviews-migrate
 spec:
   ttlSecondsAfterFinished: 100
   backoffLimit: 4
@@ -9,8 +9,8 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: bl-ms-widgets-migrate
-        image: bl-ms-widgets
+      - name: bl-ms-reviews-migrate
+        image: bl-ms-reviews
         env:
           - name: MYSQL_USERNAME
             valueFrom:
@@ -28,6 +28,6 @@ spec:
                 name: bl-env-secret
                 key: MYSQL_HOST
           - name: DATABASE_URL
-            value: "mysql://$(MYSQL_USERNAME):$(MYSQL_PASSWORD)@$(MYSQL_HOST):3306/widgets"
+            value: "mysql://$(MYSQL_USERNAME):$(MYSQL_PASSWORD)@$(MYSQL_HOST):3306/reviews"
         command: ["npx", "prisma", "migrate", "deploy"]
 

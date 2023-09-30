@@ -4,8 +4,8 @@ export enum INCOMING_TOPICS {
 
 export enum BROADCAST_TOPICS {
   DLX_LOGS = 'bl.event.dlx.logs',
-  PUBLISH_EMAIL = 'bl.event.widgets.created',
-  WIDGET_CREATED = 'bl.event.widget.created',
-  WIDGET_UPDATED = 'bl.event.widget.updated',
-  WIDGET_DELETED = 'bl.event.widget.deleted',
+  PUBLISH_EMAIL = 'bl.event.reviews.created',
+  WIDGET_CREATED = 'bl.event.review.created',
+  WIDGET_UPDATED = 'bl.event.review.updated',
+  WIDGET_DELETED = 'bl.event.review.deleted',
 }

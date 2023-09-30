@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bl-ms-widgets
+  name: bl-ms-reviews
 spec:
   selector:
     matchLabels:
-      app: bl-ms-widgets
+      app: bl-ms-reviews
   replicas: 1
   template:
     metadata:
       labels:
-        app: bl-ms-widgets
+        app: bl-ms-reviews
     spec:
       containers:
-        - name: bl-ms-widgets
-          image: bl-ms-widgets
+        - name: bl-ms-reviews
+          image: bl-ms-reviews
           volumeMounts:
           - name: secret-volume
             mountPath: "/etc/secret-volume"

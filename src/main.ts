@@ -1,9 +1,9 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from 'nestjs-pino';
-import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import {ValidationPipe} from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import {Logger} from 'nestjs-pino';
+import {AppModule} from './app.module';
+import {HttpExceptionFilter} from './common/filters/http-exception.filter';
 import tracer from './tracing';
 
 async function bootstrap() {
@@ -22,8 +22,8 @@ async function bootstrap() {
   );
 
   const options = new DocumentBuilder()
-    .setTitle('bl-ms-widget')
-    .setDescription('Widget application')
+    .setTitle('bl-ms-review')
+    .setDescription('Review application')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

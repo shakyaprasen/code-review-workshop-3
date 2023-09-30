@@ -4,8 +4,8 @@ namespace: blue-lightning-staging
 resources:
 - ../../base
 images:
-- name: bl-ms-widgets
-  newName: 726213127376.dkr.ecr.us-east-1.amazonaws.com/bl-ms-widgets
-- name: bl-ms-widgets-migrate
-  newName: 726213127376.dkr.ecr.us-east-1.amazonaws.com/bl-ms-widgets
+- name: bl-ms-reviews
+  newName: 726213127376.dkr.ecr.us-east-1.amazonaws.com/bl-ms-reviews
+- name: bl-ms-reviews-migrate
+  newName: 726213127376.dkr.ecr.us-east-1.amazonaws.com/bl-ms-reviews
 

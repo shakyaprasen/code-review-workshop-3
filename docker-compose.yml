@@ -1,26 +1,26 @@
 version: '3'
 
 services:
-  ms_widgets:
-    container_name: 'ms_widgets'
+  ms_reviews:
+    container_name: 'ms_reviews'
     build:
       context: .
       dockerfile: ./Dockerfile-dev
     volumes:
       - .:/app
     links:
-      - widgets_db
+      - reviews_db
     depends_on:
-      - widgets_db
+      - reviews_db
     command: npm run start:dev
     ports:
       - 3000:3000
       - 9229:9229
     environment:
-      DATABASE_URL: mysql://root:password@widgets_db:3306/widgets
+      DATABASE_URL: mysql://root:password@reviews_db:3306/reviews
       NODE_ENV: docker-compose
 
-  widgets_zookeeper:
+  reviews_zookeeper:
     image: quay.io/debezium/zookeeper:1.9.4.Final
     ports:
      - 2181:2181
@@ -31,45 +31,45 @@ services:
       - zookeeperTxns:/zookeeper/txns
       - zookeeperLogs:/zookeeper/logs
 
-  widgets_db:
+  reviews_db:
     image: mysql:8.0
     restart: always
     cap_add:
       - SYS_NICE
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=widgets
+      - MYSQL_DATABASE=reviews
     ports:
       - '3306:3306'
     volumes:
       - db:/var/lib/mysql
 
-  widgets_kafka:
+  reviews_kafka:
     image: quay.io/debezium/kafka:1.9.4.Final
     ports:
      - 9092:9092
     links:
-     - widgets_zookeeper
+     - reviews_zookeeper
     volumes:
       - kafkadata:/kafka/data
       - kafkaLogs:/kafka/logs
     environment:
-     - ZOOKEEPER_CONNECT=widgets_zookeeper:2181
+     - ZOOKEEPER_CONNECT=reviews_zookeeper:2181
 
-  widgets_kafka-ui:
-    container_name: bl-widget-kafka-ui
+  reviews_kafka-ui:
+    container_name: bl-review-kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
       - 8081:8080
     links:
-     - widgets_zookeeper
-     - widgets_kafka
+     - reviews_zookeeper
+     - reviews_kafka
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: widgets_kafka:9092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: reviews_kafka:9092
       KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: first
       KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://connect:8083
-      KAFKA_CLUSTERS_0_ZOOKEEPER: widgets_zookeeper:2181
+      KAFKA_CLUSTERS_0_ZOOKEEPER: reviews_zookeeper:2181
 
   jaeger:
     image: jaegertracing/all-in-one:latest

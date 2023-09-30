@@ -4,14 +4,14 @@ import {
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as process from 'process';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { KafkaJsInstrumentation } from 'opentelemetry-instrumentation-kafkajs';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { ElasticsearchInstrumentation } from 'opentelemetry-instrumentation-elasticsearch';
+import {SemanticResourceAttributes} from '@opentelemetry/semantic-conventions';
+import {JaegerExporter} from '@opentelemetry/exporter-jaeger';
+import {OTLPTraceExporter} from '@opentelemetry/exporter-trace-otlp-proto';
+import {KafkaJsInstrumentation} from 'opentelemetry-instrumentation-kafkajs';
+import {getNodeAutoInstrumentations} from '@opentelemetry/auto-instrumentations-node';
+import {ElasticsearchInstrumentation} from 'opentelemetry-instrumentation-elasticsearch';
 import * as opentelemetry from '@opentelemetry/sdk-node';
-import { Resource } from '@opentelemetry/resources';
+import {Resource} from '@opentelemetry/resources';
 
 const exporter = new JaegerExporter({
   endpoint:
@@ -28,7 +28,7 @@ const traceExporter = new OTLPTraceExporter({
 
 const otelSdk = new opentelemetry.NodeSDK({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'bl-ms-widgets',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'bl-ms-reviews',
   }),
   spanProcessor:
     process.env.NODE_ENV === 'docker-compose'
