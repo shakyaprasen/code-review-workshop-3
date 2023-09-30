@@ -1,18 +1,21 @@
-import {Module, ValidationPipe} from '@nestjs/common';
-import {ConfigModule} from '@nestjs/config';
-import {APP_PIPE} from '@nestjs/core';
-import * as Joi from 'joi';
-import {LoggerModule} from 'nestjs-pino';
+import { Module, ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
+import { LoggerModule } from 'nestjs-pino';
 import appConfig from './config/app.config';
-import {ReviewsModule} from './reviews/reviews.module';
-import {KafkaModule} from './kafka/kafka.module';
-import {PrismaModule} from './prisma/prisma.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { KafkaModule } from './kafka/kafka.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     KafkaModule,
     PrismaModule,
     ConfigModule.forFeature(appConfig),
+    JwtModule.register({
+      secret: 'random-secret',
+    }),
     LoggerModule.forRoot({
       pinoHttp: {
         customProps: (req, res) => ({
@@ -21,12 +24,12 @@ import {PrismaModule} from './prisma/prisma.module';
         transport:
           process.env.NODE_ENV !== 'production'
             ? {
-              target: 'pino-pretty',
-              options: {
-                singleLine: true,
-                colorize: true,
-              },
-            }
+                target: 'pino-pretty',
+                options: {
+                  singleLine: true,
+                  colorize: true,
+                },
+              }
             : undefined,
       },
     }),
@@ -41,4 +44,4 @@ import {PrismaModule} from './prisma/prisma.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
