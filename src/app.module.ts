@@ -8,6 +8,7 @@ import { KafkaModule } from './kafka/kafka.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 
+
 @Module({
   imports: [
     KafkaModule,
