@@ -11,13 +11,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
-import {Meta, MetaData} from 'src/common/decorators/meta.decorator';
-import {PaginationQueryDto} from 'src/common/dto/pagination-query.dto';
-import {CreateReviewDto} from './dto/create-review.dto';
-import {UpdateReviewDto} from './dto/update-review.dto';
-import {ReviewsService} from './reviews.service';
-import {Review} from '@prisma/client';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Meta, MetaData } from 'src/common/decorators/meta.decorator';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
+import { ReviewsService } from './reviews.service';
+import { Review } from '@prisma/client';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('reviews')
 @Controller('reviews')
@@ -25,13 +26,13 @@ export class ReviewsController {
   // Import logger from nest js but under the hood, pino will be used
   private readonly logger = new Logger(ReviewsController.name);
 
-  constructor(private readonly reviewsService: ReviewsService) { }
+  constructor(private readonly reviewsService: ReviewsService) {}
 
   @ApiBearerAuth()
-  @ApiResponse({status: 200, description: 'List of reviews.'})
+  @ApiResponse({ status: 200, description: 'List of reviews.' })
   @Get()
   async findAll(@Query() paginationQuery: PaginationQueryDto) {
-    return this.reviewsService.findAll({...paginationQuery});
+    return this.reviewsService.findAll({ ...paginationQuery });
   }
 
   @ApiBearerAuth()
@@ -42,6 +43,7 @@ export class ReviewsController {
 
   @ApiBearerAuth()
   @Post()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   async create(
     @MetaData() meta: Meta,
     @Body() createReviewDto: CreateReviewDto,
